@@ -1,0 +1,15 @@
+database:
+  host: localhost
+  port: 5432
+  name: ecommerce_db
+  user: ecommerce_user
+  password: teja123 
+
+paths:
+  raw_data_dir: data/raw
+  processed_data_dir: data/processed
+  reports_dir: data/reports
+
+quality_thresholds:
+  min_completeness: 0.98
+  min_uniqueness: 0.99
