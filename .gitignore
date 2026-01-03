@@ -19,3 +19,24 @@ data/reports/*
 # OS
 .DS_Store
 Thumbs.db
+
+
+# Python cache & venv
+.venv
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Git
+.git
+.gitignore
+
+# Data and reports (they don't need to be baked into the image)
+data/raw/*
+data/processed/*
+data/reports/*
+
+# Local env files
+.env
+.env.*
