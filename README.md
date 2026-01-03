@@ -25,7 +25,7 @@ Git
 Docker & Docker Compose (optional)
 Tableau Public (for dashboards)
 Installation
-Clone the repository git clone https://github.com/yourusername/ecommerce-data-pipeline-23P31A4411.git cd ecommerce-data-pipeline-23P31A4411
+Clone the repository git clone https://github.com/SaitejaSpidy18/ecommerce-data-pipeline-23P31A4421.git cd ecommerce-data-pipeline-23P31A4421
 text
 
 Create virtual environment python -m venv venv
