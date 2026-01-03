@@ -22,11 +22,6 @@ Thumbs.db
 
 
 # Python cache & venv
-.venv
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
 
 # Git
 .git
