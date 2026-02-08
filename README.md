@@ -1,7 +1,7 @@
 # ecommerce-data-pipeline-23P31A4421
 A complete end-to-end data engineering project demonstrating ETL/ELT pipeline design, data warehousing, automation, testing, and BI analytics.
 
-📋 Project Overview
+Project Overview
 This project implements a production-ready data pipeline for an e-commerce analytics platform that:
 
 Generates 30,000+ realistic transactional records
@@ -13,12 +13,10 @@ Provides interactive Tableau dashboards
 Includes >80% test coverage with unit and integration tests
 Uses Docker for containerization
 Implements CI/CD with GitHub Actions
-🏗️ Architecture
+Architecture
 ┌─────────────────────────────────────────────────────────────┐ │ Data Generation (Faker) │ │ 1000 Customers, 500 Products │ │ 10,000 Transactions, 20,000+ Items │ └──────────────────────┬──────────────────────────────────────┘ │ ▼ ┌─────────────────────────────────────────────────────────────┐ │ Staging Layer (SQLite) │ │ Raw Data - Minimal Constraints - Fast Bulk Loading │ │ - staging.customers │ │ - staging.products │ │ - staging.transactions │ │ - staging.transaction_items │ └──────────────────────┬──────────────────────────────────────┘ │ ▼ ┌─────────────────────────────────────────────────────────────┐ │ Data Quality Checks & Validation │ │ - Null Values Check │ │ - Duplicate Detection │ │ - Referential Integrity │ │ - Data Range Validation │ │ - Quality Scoring (>80%) │ └──────────────────────┬──────────────────────────────────────┘ │ ▼ ┌─────────────────────────────────────────────────────────────┐ │ Production Layer (SQLite - 3NF) │ │ Cleansed & Validated Data - Full Constraints │ │ - production.customers (with audit columns) │ │ - production.products (price validations) │ │ - production.transactions (referential integrity) │ │ - production.transaction_items (business rules) │ └──────────────────────┬──────────────────────────────────────┘ │ ▼ ┌─────────────────────────────────────────────────────────────┐ │ Warehouse Layer (SQLite - Star Schema) │ │ Dimensional Model for Analytics & BI │ │ Dimensions: │ │ - warehouse.dim_customers (SCD Type 2) │ │ - warehouse.dim_products │ │ - warehouse.dim_date (365 days) │ │ - warehouse.dim_payment_method │ │ Facts: │ │ - warehouse.fact_sales (30,000+ rows) │ │ Aggregates: │ │ - warehouse.agg_daily_sales │ │ - warehouse.agg_product_performance │ │ - warehouse.agg_customer_metrics │ └──────────────────────┬──────────────────────────────────────┘ │ ▼ ┌─────────────────────────────────────────────────────────────┐ │ Analytics & Visualization (Tableau) │ │ 4 Dashboard Pages with 17+ Visualizations │ │ - Executive KPI Dashboard │ │ - Sales & Revenue Analysis │ │ - Customer & Geographic Insights │ │ - Detailed Analytics │ └─────────────────────────────────────────────────────────────┘
 
-text
-
-🚀 Quick Start
+Quick Start
 Prerequisites
 Python 3.9+
 Git
@@ -33,34 +31,28 @@ On Windows: venv\Scripts\activate
 
 On Linux/Mac: source venv/bin/activate
 
-text
 
 Install dependencies pip install -r requirements.txt
-text
+
 
 Setup environment variables cp .env.example .env
 Edit .env with your configuration text
 
 Initialize database and run pipeline python scripts/orchestration/orchestrator.py
-text
 
 📊 Running the Pipeline
 Option 1: Direct Execution
 python scripts/orchestration/orchestrator.py
 
-text
-
 Option 2: Using Docker Compose
 docker-compose up --build
-
-text
 
 Option 3: Scheduled Execution
 The pipeline can be scheduled using:
 
 Windows: Task Scheduler + scripts/scheduler/schedule_pipeline.bat
 Linux/Mac: Cron + scripts/scheduler/schedule_pipeline.sh
-🧪 Testing
+Testing
 Run comprehensive test suite (32+ test cases, 86% coverage):
 
 Run all tests with coverage pytest tests/ -v --cov=scripts --cov-report=html
@@ -69,14 +61,14 @@ Run specific test file pytest tests/test_data_generation.py -v
 
 Run with detailed output pytest tests/ -vv
 
-text
+
 
 Test coverage report available in htmlcov/index.html
 
-📈 Project Structure
+Project Structure
 ecommerce-data-pipeline/ ├── config/ │ └── config.yaml # Pipeline configuration ├── dashboards/ │ ├── tableau/ # Tableau workbooks │ └── screenshots/ # Dashboard screenshots ├── data/ │ ├── raw/ # Raw generated CSV files │ ├── staging/ # Staging layer data │ └── processed/ # Processed/warehouse data ├── docker/ │ ├── Dockerfile # Container configuration │ └── docker-compose.yml # Multi-container setup ├── docs/ │ ├── architecture.md # Architecture documentation │ ├── dashboard_guide.md # Dashboard guide │ └── api_documentation.md # API/Pipeline documentation ├── logs/ # Pipeline execution logs ├── scripts/ │ ├── data_generation/ # Data generation scripts │ ├── ingestion/ # Data ingestion scripts │ ├── quality_checks/ # Data quality checks │ ├── transformation/ # ETL transformation scripts │ ├── orchestration/ # Pipeline orchestrator │ └── scheduler/ # Scheduling configuration ├── sql/ │ ├── ddl/ # Table creation scripts │ ├── dml/ # Data manipulation scripts │ └── queries/ # Analytical queries ├── tests/ # Unit and integration tests ├── .github/ │ └── workflows/ # GitHub Actions CI/CD ├── requirements.txt # Python dependencies ├── pytest.ini # Pytest configuration ├── README.md # This file ├── SUBMISSION.md # Project submission checklist └── docker-compose.yml # Docker Compose configuration
 
-text
+
 
 🔧 Key Components
 1. Data Generation (scripts/data_generation/)
@@ -111,7 +103,7 @@ Windows: Task Scheduler integration
 Linux/Mac: Cron job integration
 Configurable frequency and retry logic
 Notification on failure
-📊 Tableau Dashboard
+ Tableau Dashboard
 Dashboard URL: [Your Tableau Public URL]
 
 Features:
@@ -123,7 +115,7 @@ KPIs: Revenue, Profit, AOV, Customer Count
 Trends: Monthly sales, product performance
 Geographic: State-wise distribution
 Segments: Customer spending analysis
-📝 Analytics Queries
+ Analytics Queries
 10+ optimized SQL queries demonstrating:
 
 Complex JOINs across dimensions and facts
@@ -133,11 +125,9 @@ Subqueries for nested analysis
 CASE statements for conditional logic
 See sql/queries/ for all analytical queries.
 
-🐳 Docker Deployment
+ Docker Deployment
 Build and Run
 docker-compose up --build
-
-text
 
 Services
 pipeline: Data pipeline execution service
@@ -147,7 +137,7 @@ Configuration
 Database persisted in Docker volumes
 Logs available in logs/ directory
 Easy environment variable configuration
-🔄 CI/CD Pipeline
+ CI/CD Pipeline
 GitHub Actions workflow (.github/workflows/ci.yml):
 
 Runs on every push to main branch
@@ -165,7 +155,7 @@ Phase	Title	Points	Status
 6	Testing & Quality Assurance	12	✅ Complete (32/37 tests passed)
 7	Documentation & Deployment	8	⏳ In Progress
 Total		100	86% Complete
-📊 Test Coverage
+ Test Coverage
 Unit Tests: 25+ test cases
 Integration Tests: 12+ test cases
 Coverage: 86% of core modules
@@ -174,29 +164,29 @@ Run coverage report: pytest tests/ --cov=scripts --cov-report=html
 
 Open htmlcov/index.html in browser text
 
-📚 Documentation
+ Documentation
 README.md: This file
 docs/architecture.md: System architecture and design decisions
 docs/dashboard_guide.md: Tableau dashboard walkthrough
 docs/api_documentation.md: Pipeline API and function documentation
 SUBMISSION.md: Project completion checklist
-🤝 Contributing
+ Contributing
 This is an educational project. For issues or improvements, please create a GitHub issue or pull request.
 
-📄 License
+ License
 This project is created for educational purposes as part of the Partnr Network Global Placement Program.
 
-✉️ Contact
-Student Name: [Your Name]
-Roll Number: 23P31A4411
-Email: [Your Email]
-Repository: https://github.com/yourusername/ecommerce-data-pipeline-23P31A4411
-🎯 Key Achievements
+ Contact
+Student Name: Venkat Phani Sai Teja Manda
+Roll Number: 23P31A4421
+Email: saitejaphani18@gmail.com
+Repository: https://github.com/SaitejaSpidy18/ecommerce-data-pipeline-23P31A4421
+Key Achievements
 ✅ Data Generation: 30,000+ records with 100% referential integrity ✅ ETL Pipeline: Full 3-tier architecture (staging, production, warehouse) ✅ Data Quality: 5+ quality dimensions, >80% quality score ✅ Star Schema: Dimensional model with SCD Type 2 support ✅ BI Analytics: 4 Tableau dashboards with 17+ visualizations ✅ Automation: Orchestrated pipeline with scheduling support ✅ Testing: 32+ test cases with 86% code coverage ✅ Documentation: Comprehensive docs and API documentation ✅ Containerization: Docker Compose setup for easy deployment ✅ CI/CD: GitHub Actions automated testing pipeline
 
-Last Updated: 25 December 2025 Submission Deadline: 27 December 2025 STEP 2: Create Architecture Documentation Create file: docs/architecture.md
+Last Updated: 25 December 2025 Submission Deadline: 27 December 2025 
+STEP 2: Create Architecture Documentation Create file: docs/architecture.md
 
-text
 
 E-Commerce Data Pipeline - Architecture Documentation
 System Architecture Overview
