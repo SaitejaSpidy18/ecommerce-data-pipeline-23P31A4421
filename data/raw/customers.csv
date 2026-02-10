@@ -1,0 +1,6 @@
+customer_id,first_name,last_name,email,phone,address,city,state,postal_code,country,signup_date,is_active
+1,John,Smith,john.smith@email.com,+91-9876543210,"123 Main St, Apt 4B",Hyderabad,Telangana,500001,India,2022-05-15,True
+2,Sarah,Johnson,sarah.j@email.com,+91-9876543211,"456 Oak Ave",Bangalore,Karnataka,560001,India,2023-02-20,True
+3,Michael,Williams,m.williams@email.com,+91-9876543212,"789 Pine Rd",Chennai,Tamil Nadu,600001,India,2022-11-10,False
+4,Emily,Brown,emily.b@email.com,+91-9876543213,"321 Elm St",Delhi,Delhi,110001,India,2023-07-08,True
+5,David,Jones,david.jones@email.com,+91-9876543214,"654 Maple Dr",Mumbai,Maharashtra,400001,India,2021-09-12,True
