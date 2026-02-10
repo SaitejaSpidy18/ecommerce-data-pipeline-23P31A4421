@@ -1,0 +1,9 @@
+product_id,product_name,category,cost,price,stock_quantity,is_active,created_date
+1,Wireless Headphones,Electronics,500.00,1299.99,150,True,2021-03-10
+2,Cotton T-Shirt,Clothing,150.00,499.99,500,True,2021-06-15
+3,Garden Tool Set,Home & Garden,800.00,1999.99,80,True,2022-01-20
+4,Yoga Mat,Sports,300.00,899.99,200,True,2021-12-05
+5,Python Programming,Books,200.00,599.99,100,False,2020-08-30
+6,Robot Toy Set,Toys,600.00,1599.99,120,True,2022-04-12
+7,Organic Coffee Beans,Food,400.00,1099.99,300,True,2023-02-18
+8,Face Cream,Beauty,150.00,599.99,250,True,2022-11-22
