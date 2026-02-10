@@ -1,15 +1,83 @@
+﻿# Global configuration for E-Commerce Data Pipeline
+environment:
+  name: "local"              # local | dev | prod
+  log_level: "INFO"          # DEBUG | INFO | WARNING | ERROR
+  timezone: "Asia/Kolkata"
 database:
-  host: localhost
-  port: 5432
-  name: ecommerce_db
-  user: ecommerce_user
-  password: teja123 
-
+  host: "${DB_HOST:-localhost}"
+  port: "${DB_PORT:-5432}"
+  name: "${DB_NAME:-ecommercedb}"
+  user: "${DB_USER:-admin}"
+  password: "${DB_PASSWORD:-password}"
+  pool_size: 5
+  max_overflow: 10
+  connect_timeout_seconds: 10
+schemas:
+  staging: "staging"
+  production: "production"
+  warehouse: "warehouse"
+data_generation:
+  num_customers: 1000
+  num_products: 500
+  num_transactions: 10000
+  min_transaction_items: 15000
+  max_transaction_items: 25000
+  start_date: "2024-01-01"
+  end_date: "2024-12-31"
+  # Controls for realism of distributions
+  seasonal_pattern: true
+  peak_months: [11, 12]      # higher volume in these months
+  popular_product_ratio: 0.2 # top 20% products get most sales
+  max_items_per_transaction: 5
+pipeline:
+  batch_size: 1000
+  commit_interval_rows: 5000
+  max_retries: 3
+  retry_backoff_seconds: 2
+  log_sql: false
 paths:
-  raw_data_dir: data/raw
-  processed_data_dir: data/processed
-  reports_dir: data/reports
-
-quality_thresholds:
-  min_completeness: 0.98
-  min_uniqueness: 0.99
+  data_raw: "data/raw"
+  data_staging: "data/staging"
+  data_processed: "data/processed"
+  logs: "logs"
+  sql_ddl: "sql/ddl"
+  sql_queries: "sql/queries"
+quality_checks:
+  enabled: true
+  schemas_to_check:
+    - "staging"
+    - "production"
+  weights:
+    completeness: 0.25
+    uniqueness: 0.20
+    validity: 0.20
+    consistency: 0.20
+    referential_integrity: 0.15
+  thresholds:
+    overall_score_min: 90.0
+    critical_violation_max: 0    # any RI break can fail pipeline
+scheduler:
+  enabled: false
+  type: "cron"                  # cron | none | airflow_external
+  daily_run_time: "02:00"       # HH:MM 24h
+  cron_expression: "0 2 * * *"  # if used by external scheduler
+bi_tool:
+  tool: "tableau"               # tableau | powerbi
+  tableau:
+    project_name: "Ecommerce Data Pipeline"
+    description: "Dashboards built on warehouse schema"
+  powerbi:
+    workspace: "My Workspace"
+    dataset_name: "Ecommerce Warehouse"
+alerts:
+  enabled: false
+  channel: "email"              # email | slack | none
+  email:
+    to: []
+    from: ""
+  slack:
+    webhook_url: ""
+testing:
+  enable_sample_run: true
+  sample_limit_per_table: 1000
+  coverage_target: 0.8
