@@ -1,0 +1,9 @@
+transaction_id,customer_id,transaction_date,payment_method,total_amount,transaction_status
+1,1,2024-02-15,Credit Card,2599.99,Completed
+2,2,2024-02-16,UPI,4999.98,Completed
+3,3,2024-02-17,Debit Card,899.99,Pending
+4,4,2024-02-18,Net Banking,1599.99,Completed
+5,5,2024-02-19,Credit Card,3499.97,Failed
+6,1,2024-02-20,UPI,1199.98,Completed
+7,2,2024-02-21,Cash,5999.99,Completed
+8,3,2024-02-22,Credit Card,799.98,Completed
