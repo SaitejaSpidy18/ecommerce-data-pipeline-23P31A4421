@@ -1,0 +1,221 @@
+﻿name: CI/CD Pipeline
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+env:
+  PYTHON_VERSION: "3.11"
+  POSTGRES_VERSION: "12"
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_DB: ecommercedb
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+    - name: Set Up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: pip
+    - name: Create logs directory
+      run: mkdir -p logs
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov
+    - name: Create config file
+      run: |
+        cp config/config.yaml.example config/config.yaml 2>/dev/null || echo "Config file not found, skipping"
+    - name: Create .env file
+      run: |
+        cat > .env << EOF
+        DB_HOST=localhost
+        DB_PORT=5432
+        DB_NAME=ecommercedb
+        DB_USER=admin
+        DB_PASSWORD=password
+        APP_ENV=testing
+        LOG_LEVEL=INFO
+        EOF
+    - name: Initialize Database Schemas
+      run: |
+        python -c "
+        import psycopg2
+        import time
+        max_retries = 5
+        for attempt in range(max_retries):
+          try:
+            conn = psycopg2.connect(
+              host='localhost',
+              port=5432,
+              database='ecommercedb',
+              user='admin',
+              password='password'
+            )
+            print('Database connected successfully')
+            conn.close()
+            break
+          except Exception as e:
+            print(f'Attempt {attempt + 1} failed: {e}')
+            if attempt < max_retries - 1:
+              time.sleep(3)
+            else:
+              raise
+        "
+    - name: Run SQL DDL Scripts
+      run: |
+        python -c "
+        import psycopg2
+        conn = psycopg2.connect(
+          host='localhost',
+          port=5432,
+          database='ecommercedb',
+          user='admin',
+          password='password'
+        )
+        cursor = conn.cursor()
+        try:
+          with open('sql/ddl/create_staging_schema.sql', 'r') as f:
+            cursor.execute(f.read())
+          print('Staging schema created')
+        except:
+          print('Staging schema already exists or error occurred')
+        try:
+          with open('sql/ddl/create_production_schema.sql', 'r') as f:
+            cursor.execute(f.read())
+          print('Production schema created')
+        except:
+          print('Production schema already exists or error occurred')
+        try:
+          with open('sql/ddl/create_warehouse_schema.sql', 'r') as f:
+            cursor.execute(f.read())
+          print('Warehouse schema created')
+        except:
+          print('Warehouse schema already exists or error occurred')
+        conn.commit()
+        cursor.close()
+        conn.close()
+        "
+    - name: Run Unit Tests
+      run: pytest tests/ -v --cov=scripts --cov-report=xml --cov-report=html --cov-fail-under=80
+      continue-on-error: false
+    - name: Generate Coverage Report
+      if: always()
+      run: |
+        pytest tests/ -v --cov=scripts --cov-report=term-missing
+    - name: Upload Coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+  lint:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+    - name: Set Up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    - name: Install Linting Tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pylint black isort
+    - name: Run Flake8
+      run: flake8 scripts/ --count --select=E9,F63,F7,F82 --show-source --statistics --max-line-length=120
+      continue-on-error: true
+    - name: Check Code Formatting with Black
+      run: black scripts/ --check --line-length=120
+      continue-on-error: true
+    - name: Check Import Sorting with isort
+      run: isort scripts/ --check-only
+      continue-on-error: true
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+    - name: Set Up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    - name: Install Security Tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit safety
+    - name: Run Bandit Security Scan
+      run: bandit -r scripts/ -ll -q
+      continue-on-error: true
+    - name: Check Dependencies for Vulnerabilities
+      run: safety check --requirements requirements.txt
+      continue-on-error: true
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: [ test, lint, security ]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+    - name: Set Up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - name: Build Docker Image
+      run: |
+        docker build -f docker/Dockerfile -t ecommerce-pipeline:${{ github.sha }} .
+        docker build -f docker/Dockerfile -t ecommerce-pipeline:latest .
+    - name: Test Docker Image
+      run: |
+        docker images
+        docker run --rm ecommerce-pipeline:latest python -c "import sys; print(f'Python {sys.version} running successfully')"
+  documentation:
+    name: Check Documentation
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+    - name: Check README exists
+      run: test -f README.md && echo "README.md found"
+    - name: Check Architecture docs exist
+      run: test -f docs/architecture.md && echo "architecture.md found"
+    - name: Check Dashboard guide exists
+      run: test -f docs/dashboard_guide.md && echo "dashboard_guide.md found"
+  notify:
+    name: Send Notifications
+    runs-on: ubuntu-latest
+    needs: [ test, lint, security, build ]
+    if: always()
+    steps:
+    - name: Determine Build Status
+      id: status
+      run: |
+        if [ "${{ needs.test.result }}" == "success" ] && \
+           [ "${{ needs.lint.result }}" == "success" ] && \
+           [ "${{ needs.security.result }}" == "success" ] && \
+           [ "${{ needs.build.result }}" == "success" ]; then
+          echo "status=SUCCESS" >> $GITHUB_OUTPUT
+        else
+          echo "status=FAILURE" >> $GITHUB_OUTPUT
+        fi
+    - name: Log Build Status
+      run: echo "CI/CD Pipeline Status: ${{ steps.status.outputs.status }}"
