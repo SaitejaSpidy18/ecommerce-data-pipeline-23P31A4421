@@ -1,0 +1,13 @@
+{
+  "generated_at": "2024-02-22T10:30:45.123456",
+  "generation_summary": {
+    "num_customers": 1000,
+    "num_products": 500,
+    "num_transactions": 10000,
+    "num_transaction_items": 18500
+  },
+  "data_quality_notes": {
+    "referential_integrity": "All customer_ids and product_ids are valid references",
+    "date_range": "Transactions span from 2024-01-01 to 2024-12-31"
+  }
+}
